@@ -14,15 +14,25 @@ export class TranscriptStore {
     return studentID;
   }
 
+
   getStudentIDs(name) {
     const matches = [];
+    const normalizedName = name === undefined
+      ? undefined
+      : String(name).trim().toLowerCase();
+
     for (const student of this.#students.values()) {
-      if (name === undefined || student.studentName === String(name)) {
+      if (
+        normalizedName === undefined ||
+        student.studentName.trim().toLowerCase() === normalizedName
+      ) {
         matches.push(student.studentID);
       }
     }
+
     return matches;
   }
+
 
   getTranscript(studentID) {
     const student = this.#requireStudent(studentID);
