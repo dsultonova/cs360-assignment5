@@ -56,6 +56,8 @@ describe("TranscriptStore", () => {
   });
 
   test("rejects duplicate grades but allows corrections", () => {
+
+  test("deleting a student also removes their stored grades", () => {
     const studentID = store.addStudent("Ada");
 
     store.addGrade(studentID, "CS360", 85);
@@ -71,4 +73,9 @@ describe("TranscriptStore", () => {
       grade: 95,
     });
   });
+    store.deleteStudent(studentID);
+
+    assert.equal(store.getGrade(studentID, "CS360"), undefined);
+  });
+
 });
