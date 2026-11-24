@@ -55,6 +55,20 @@ describe("TranscriptStore", () => {
     assert.throws(() => store.deleteStudent(secondID), /Student not found/);
   });
 
+  test("finds students regardless of name case or surrounding whitespace", () => {
+    const studentID = store.addStudent("Ada Lovelace");
+
+    assert.deepEqual(store.getStudentIDs("ada lovelace"), [studentID]);
+
+    assert.deepEqual(store.getStudentIDs("  Ada Lovelace  "), [studentID]);
+
+    assert.deepEqual(store.getStudentIDs("ADA LOVELACE"), [studentID]);
+
+    assert.deepEqual(store.getTranscript(studentID), {
+      student: { studentID, studentName: "Ada Lovelace" },
+      grades: [],
+    });
+  });
   test("rejects duplicate grades but allows corrections", () => {
 
   test("deleting a student also removes their stored grades", () => {
