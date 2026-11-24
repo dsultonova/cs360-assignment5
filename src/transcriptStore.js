@@ -14,15 +14,25 @@ export class TranscriptStore {
     return studentID;
   }
 
+
   getStudentIDs(name) {
     const matches = [];
+    const normalizedName = name === undefined
+      ? undefined
+      : String(name).trim().toLowerCase();
+
     for (const student of this.#students.values()) {
-      if (name === undefined || student.studentName === String(name)) {
+      if (
+        normalizedName === undefined ||
+        student.studentName.trim().toLowerCase() === normalizedName
+      ) {
         matches.push(student.studentID);
       }
     }
+
     return matches;
   }
+
 
   getTranscript(studentID) {
     const student = this.#requireStudent(studentID);
@@ -34,9 +44,12 @@ export class TranscriptStore {
 
   deleteStudent(studentID) {
     const parsedID = this.#parseStudentID(studentID);
+
     if (!this.#students.delete(parsedID)) {
       throw new Error(`Student not found: ${parsedID}`);
     }
+
+    this.#grades.delete(parsedID);
   }
 
   addGrade(studentID, course, grade) {
@@ -46,6 +59,10 @@ export class TranscriptStore {
       this.#validateCourseAndGrade(course, grade);
 
     const studentGrades = this.#grades.get(parsedID) ?? new Map();
+
+    if (studentGrades.has(normalizedCourse)) {
+      throw new Error(`Grade already exists for course ${normalizedCourse}`);
+    }
 
     studentGrades.set(normalizedCourse, numericGrade);
     this.#grades.set(parsedID, studentGrades);
